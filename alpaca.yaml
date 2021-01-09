@@ -1,0 +1,167 @@
+
+draws:
+- type: ARC
+  radius: 2.0000
+  center: {x: -3.4210, y: -6.4179}
+  range: {start: 166, end: 318}
+  border: black
+- type: ARC
+  radius: 2.0000
+  center: {x: 3.4210, y: -6.4179}
+  range: {start: 222, end: 14}
+  border: black
+- type: ARC
+  radius: 2.0000
+  center: {x: 0.0000, y: -7.2728}
+  range: {start: 194, end: 346}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: 8.0000, y: -7.8145}
+  - {x: 8.0000, y: -18.7728}
+  border: black
+- type: ARC
+  radius: 11.1833
+  center: {x: 0.0000, y: 0.0000}
+  range: {start: 155, end: 224}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: -8.0000, y: -7.8145}
+  - {x: -8.0000, y: -18.7728}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: 0.0000, y: -3.7728}
+  - {x: 0.0000, y: -5.5728}
+  border: black
+- type: ARC
+  radius: 1.7000
+  center: {x: 0.0000, y: -7.2728}
+  range: {start: 69, end: 111}
+  border: black
+- type: ARC
+  radius: 1.2728
+  center: {x: 0.0000, y: -2.5000}
+  range: {start: 180, end: 0}
+  border: black
+- type: ARC
+  radius: 2.0000
+  center: {x: 0.0000, y: -3.7728}
+  range: {start: 210, end: 331}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: 0.0000, y: -3.7728}
+  - {x: 1.2728, y: -2.5000}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: 0.0000, y: -3.7728}
+  - {x: -1.2728, y: -2.5000}
+  border: black
+- type: ARC
+  radius: 1.0000
+  center: {x: -6.3301, y: 2.1650}
+  range: {start: 176, end: 64}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: -8.6011, y: 13.1141}
+  - {x: -7.0127, y: 10.3475}
+  border: black
+- type: ARC
+  radius: 12.5000
+  center: {x: 0.0000, y: 0.0000}
+  range: {start: 124, end: 144}
+  border: black
+- type: ARC
+  radius: 4.5000
+  center: {x: -6.1028, y: 9.3713}
+  range: {start: 124, end: 207}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: 8.6011, y: 13.1141}
+  - {x: 7.0127, y: 10.3475}
+  border: black
+- type: ARC
+  radius: 12.5000
+  center: {x: 0.0000, y: 0.0000}
+  range: {start: 36, end: 56}
+  border: black
+- type: ARC
+  radius: 4.5000
+  center: {x: 6.1028, y: 9.3713}
+  range: {start: 333, end: 56}
+  border: black
+- type: ARC
+  radius: 11.1833
+  center: {x: 0.0000, y: 0.0000}
+  range: {start: 316, end: 25}
+  border: black
+- type: ARC
+  radius: 6.2000
+  center: {x: 6.1028, y: 9.3713}
+  range: {start: 311, end: 60}
+  border: black
+- type: ARC
+  radius: 1.2000
+  center: {x: 8.6028, y: 13.7014}
+  range: {start: 60, end: 150}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: 5.0636, y: 9.9713}
+  - {x: 7.5636, y: 14.3014}
+  border: black
+- type: ARC
+  radius: 6.2000
+  center: {x: -6.1028, y: 9.3713}
+  range: {start: 120, end: 229}
+  border: black
+- type: ARC
+  radius: 1.2000
+  center: {x: -8.6028, y: 13.7014}
+  range: {start: 30, end: 120}
+  border: black
+- type: LINE
+  vertexes:
+  - {x: -5.0636, y: 9.9713}
+  - {x: -7.5636, y: 14.3014}
+  border: black
+- type: ARC
+  radius: 11.1833
+  center: {x: 0.0000, y: 0.0000}
+  range: {start: 63, end: 117}
+  border: black
+- type: ARC
+  radius: 2.0000
+  center: {x: -2.8810, y: 6.4576}
+  range: {start: 224, end: 327}
+  border: black
+- type: ARC
+  radius: 5.5000
+  center: {x: -9.3301, y: 7.3612}
+  range: {start: 270, end: 335}
+  border: black
+- type: ARC
+  radius: 2.0000
+  center: {x: 2.8810, y: 6.4576}
+  range: {start: 213, end: 316}
+  border: black
+- type: ARC
+  radius: 1.8000
+  center: {x: 0.0000, y: 6.7272}
+  range: {start: 228, end: 312}
+  border: black
+- type: ARC
+  radius: 5.5000
+  center: {x: 9.3301, y: 7.3612}
+  range: {start: 205, end: 270}
+  border: black
+- type: ARC
+  radius: 1.0000
+  center: {x: 6.3301, y: 2.1650}
+  range: {start: 116, end: 4}
+  border: black
