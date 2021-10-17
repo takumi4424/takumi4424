@@ -14,24 +14,25 @@ tempdir="$(mktemp -d)"
 # Homebrewでインストールするソフトウェアのリスト
 apt_apps=(
     fish
-    docker
+    docker-ce docker-ce-cli containerd.io
     dialog
-    lima
     jq
 )
 # 準備
 if ! which fish >/dev/null; then sudo apt-add-repository ppa:fish-shell/release-3; fi
-
-
-################################################################################
-################################# フォント関連 #################################
-################################################################################
-if ! [[ -d /usr/share/fonts/HackGen ]]; then
-    curl -Lo "$tempdir/HackGen.zip" https://github.com/yuru7/HackGen/releases/download/v2.5.1/HackGen_v2.5.1.zip
-    unzip "$tempdir/HackGen.zip"
-    sudo mv "$tempdir/HackGen_v2.5.1" /usr/share/fonts/HackGen
-    fc-cache -fv
+if ! which docker >/dev/null; then
+    sudo apt update
+    sudo apt install -y
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 fi
+sudo apt update
+
 
 ################################################################################
 ################################### Fish関連 ###################################
@@ -39,6 +40,24 @@ fi
 # if [[ $(cat /etc/passwd | grep -E "^$(id -un):" | cut -d : -f 7) != $(which fish) ]]; then
 #     sudo chsh -s "$(which fish)" "$(id -un)"
 # fi
+
+################################################################################
+################################# フォント関連 #################################
+################################################################################
+if ! [[ -d /usr/share/fonts/HackGen ]]; then
+    url='https://github.com/yuru7/HackGen/releases'
+    pattern="<html><body>You are being <a href=\"$url/tag/(.+)\">redirected</a>\.</body></html>"
+    if [[ $(curl -s $url/latest) =~ ^$pattern$ ]]; then
+        # 最新のHackGenフォントをダウンロード
+        version="${BASH_REMATCH[1]}"
+        curl -Lo "$tempdir/HackGen.zip" "$url/download/$version/HackGen_$version.zip"
+        unzip "$tempdir/HackGen.zip" -d "$tempdir"
+        mv "$tempdir/HackGen_$version" /usr/share/fonts/HackGen
+    else
+        abort "Error: Failed to install HackGen font..."
+    fi
+    fc-cache -fv
+fi
 
 ################################################################################
 ########################## その他アプリケーション設定 ##########################
@@ -56,3 +75,8 @@ if ! dconf list "$profiles/" | grep "$uuid" >/dev/null; then
     # デフォルトを{uuid: $uuid}に設定
     dconf write "$profiles/default" "'$uuid'"
 fi
+
+
+
+# 終わりに
+source "$here/setup_common_pre.bash"
