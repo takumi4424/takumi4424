@@ -1,144 +1,234 @@
-"------------------------ Function definitions ------------------------
-" Creates the specified directory if doesn't exist.
-" @param dirpath The directory path
-function s:mkdir(dirpath)
-	if !isdirectory(a:dirpath)
-		call mkdir(expand(a:dirpath), 'p')
-	endif
-endfunction
-
-" Sets value to option variable
-" @param option Option name like: backupdir
-" @param valu   Value to set to the specified option
-function s:setoption(option, value)
-	execute 'set ' . a:option . '=' . a:value
-endfunction
-
-
-"------------------------ Basic directories ------------------------
-let s:cache_dir  = expand('~/.vim/cache')
-let s:tmp_dir    = expand('~/.vim/tmp')
-let s:bundle_dir = expand('~/.vim/bundles')
-" check if directories exist and create it
-call s:mkdir(s:tmp_dir)
-call s:mkdir(s:cache_dir)
-call s:mkdir(s:bundle_dir)
-" set auto output files directory
-call s:setoption('directory', s:tmp_dir)
-call s:setoption('backupdir', s:tmp_dir)
-call s:setoption('viminfo+', 'n~/.vim/viminfo')
-
-
-"------------------------ Basic settings ------------------------
-let s:colorscheme_plugin = 'jacoborus/tender'
-set number                        " display line number
-set whichwrap=b,s,h,l,<,>,[,],~   " automatically wrap left and right
-set tabstop=4                     " tab width
-set shiftwidth=4
-set backspace=start,eol,indent    " backspace and delete problems
-set cursorline                    " hightlite cursor line
-set ambiwidth=double              " for double-byte character
-set t_Co=256
-" bash like completion method
-set wildmenu
-set wildignorecase
-set wildmode=longest,list
-
-
-"------------------------ Plugin settings ------------------------
-" Set up dein plugin manager
-let s:dein_path = s:bundle_dir . '/dein.vim'
-" check if dein exists
-if !isdirectory(s:dein_path)
-	echom "Installing dein plugin manager..."
-    execute 'silent !git -C ' . s:bundle_dir . ' -c advice.detachedHead=false clone -q --depth 1 -b 1.0 https://github.com/Shougo/dein.vim'
-endif
+scriptencoding utf-8
+" Be iMproved
 if &compatible
-	set nocompatible
+    set nocompatible
 endif
-call s:setoption('runtimepath+', s:dein_path)
-if dein#load_state(s:bundle_dir)
-	call dein#begin(s:bundle_dir)
-	call dein#add(s:dein_path)
+" 一度OFFにする(最後にONにする)
+filetype off
 
-	" status line
-	call dein#add('itchyny/lightline.vim')
-	" Colorscheme
-	call dein#add(s:colorscheme_plugin . '.vim')
-
-	call dein#add('tyru/caw.vim')
-
-	call dein#end()
-	call dein#save_state()
-endif
-filetype plugin indent on
-if dein#check_install()
-	call dein#install()
-endif
-syntax on
-execute 'colorscheme ' . split(s:colorscheme_plugin, '/')[1]
-
-
-"------------------------ lightline and tabline setup ------------------------
-" Returns current buffer name.
-" This function uses fnamebody()
-" @param mods 2nd argument for fnamemodify()
-" @return     Current buffer name
-function! g:LL_getCurrentBufferName(mods)
-	let n = tabpagenr()
-	let bufnrs = tabpagebuflist(n)
-	let curbufnr = bufnrs[tabpagewinnr(n) - 1]
-	let fname = bufname(curbufnr)
-	let path = fnamemodify(fname, a:mods)
-	return path
-endfunction
-" activate and basic settings
-set noshowmode
-set laststatus=2
-set showtabline=2
-set guioptions-=e
-" customize lightline
-let g:lightline = {'colorscheme': 'wombat'}
-let g:lightline.component = {
-	\ 'bufpath': '%{g:LL_getCurrentBufferName(:~)}',
-	\ 'bufdir': '%{g:LL_getCurrentBufferName(":~:h")}'
-\ }
-let g:lightline.tabline = {
-	\ 'right': [['bufdir']]
-\ }
-let g:lightline.tab = {
-	\ 'active': ['filename', 'modified'],
-	\ 'inactive': ['filename', 'modified']
-\ }
-
-
-highlight Visual ctermbg=LightGray guibg=LightGray
-
-" C-* key settings
-if has('unix') || has('mac')
-	" enable C-s, C-q keybind
-	execute 'silent !stty -ixon'
-	execute 'silent !stty quit undef'
-endif
-if has('win32') || has('win64')
+if has('mac')
+    " MacOS
+elseif has('unix')
+    " MacOS以外のUnix
+elseif has('win32') || has('win64')
+    " Windows
 endif
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""" ディレクトリ関連 """""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 関連するすべてのファイルを.vim以下に配置
+let $VIM=expand('~/.vim')
+" スワップファイル等の置き場
+let $VIM_TMP=expand('$VIM/tmp')
+" プラグイン置き場
+let $VIM_BUNDLES=expand('$VIM/bundles')
+" dein.vimのパス
+let $VIM_DEIN=expand('$VIM/bundles/repos/github.com/Shougo/dein.vim')
+" ない場合はディレクトリ作成
+if !isdirectory(expand('$VIM'))     | call mkdir(expand('$VIM'))     | endif
+if !isdirectory(expand('$VIM/tmp')) | call mkdir(expand('$VIM/tmp')) | endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""" Other Options """""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 自動生成ファイル関連
+set viminfo+=n$VIM/viminfo      " 履歴情報ファイルの保存先
+set swapfile                    " スワップファイル(*.swp)を生成
+set directory=$VIM/tmp,.        " 保存先は最悪カレントディレクトリ(.)
+set backup                      " バックアップファイル(*~)を生成
+set backupdir=$VIM/tmp,.        " 保存先は最悪カレントディレクトリ(.)
+set undofile                    " アンドゥファイル(*.un~)を生成
+set undodir=$VIM/tmp,.          " 保存先は最悪カレントディレクトリ(.)
+" 表示
+syntax enable                   " 構文ハイライト有効化
+set number                      " 行番号表示
+set cursorline                  " カーソル行の強調
+set ambiwidth=double            " 全角文字を正しく表示するように(注:airline)
+set t_Co=256                    " 256色対応
+" 表示(lightline関連)
+set noshowmode                  " modeはlightlineで表示なので標準のものは不要
+set laststatus=2                " 常にステータスラインを表示
+set showtabline=2               " 常にタブラインを表示(上部のやつ)
+set guioptions-=e               " gVimでもテキストベースのタブラインを表示
+" インデント
+set expandtab                   " タブ文字の代わりに空白
+set tabstop=4                   " ファイル内のタブ文字の表示幅
+set shiftwidth=4                " 自動挿入インデントの幅
+" 補完
+set wildmenu                    " [Tab]による補完(コマンドラインモード)
+set wildignorecase              " [Tab]による補完時に大文字/小文字を無視
+set wildmode=list,longest       " [Tab]による補完の挙動設定
+                                "                 候補のうちの最初でのみ補完
+                                "   full          [Tab]ごとに次の候補へ
+                                "   longest       最長の共通部分まで補完
+                                "   longest:full  最長の共通部分まで補完
+                                "                 wildmenuが有効なら開始
+                                "   list          マッチするものをリスト表示
+                                "   list:full     マッチするものをリスト表示
+                                "                 候補のうち最初を補完
+                                "   list:longest  マッチするものをリスト表示
+                                "                 最長の共通部分まで補完
+                                "   list:lastused バッファを使用履歴順でソート
+                                "                 (現在のバッファ以外)
+" その他
+set whichwrap=b,s,h,l,<,>,[,],~ " 特定キーに行頭/行末の回り込み移動を許可
+                                "   b: [Backspace] Normal/Visual mode
+                                "   s: [Space]     Normal/Visual mode
+                                "   h: h           Normal/Visual mode
+                                "   l: l           Normal/Visual mode
+                                "   <: [←]        Normal/Visual mode
+                                "   >: [→]        Normal/Visual mode
+                                "   [: [←]        Insert/Replace mode
+                                "   ]: [→]        Insert/Replace mode
+                                "   ~: ~           Normal mode
+set backspace=start,eol,indent  " [Backspace]/[Ctrl-W]/[Ctrl-U]の挙動
+                                "   start  挿入の開始点を超えて消去可能
+                                "          [Ctrl-W/U]は開始位置で一時停止
+                                "   indent 自動挿入インデントを消去可能に
+                                "   eol    行末を消去可能に(行を連結)
+" 最後のカーソル位置を復元する
+if has("autocmd")
+    autocmd BufReadPost *
+    \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+    \   exe "normal! g'\"" |
+    \ endif
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""" Key Mappings """""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " toggle comment
 nmap <C-\> <Plug>(caw:hatpos:toggle)
 imap <C-\> <ESC><Plug>(caw:hatpos:toggle)a
 vmap <C-\> <Plug>(caw:hatpos:toggle)
-
-" move to head
+" 行頭への移動
 nnoremap <C-a> ^
 inoremap <C-a> <ESC>^i
-" move to tail
+" 行末への移動
 nnoremap <C-e> $
 inoremap <C-e> <ESC>$a
-" undo
-nnoremap <C-z> u
-inoremap <C-z> <ESC>ua
-cnoremap <C-z> <C-e><C-u>undo<CR>
-" redo
-nnoremap <C-y> <C-r>
-inoremap <C-y> <ESC><C-r>a
-cnoremap <C-y> <C-e><C-u>redo<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""" Plugin Management by dein.vim """""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if !isdirectory($VIM_DEIN)
+    " まだ無い場合はdein.vimをインストール
+    exec 'silent !curl -fsSL https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh | /bin/bash -s -- '.$VIM_BUNDLES.' >/dev/null'
+endif
+set runtimepath+=$VIM_DEIN
+" プラグインの管理
+call dein#begin($VIM_BUNDLES)
+    call dein#add($VIM_DEIN)                " let dein manage dein
+    call dein#add('itchyny/lightline.vim')  " かっこいいビジュアルで
+    call dein#add('cocopon/iceberg.vim')    " カラースキーム
+    call dein#add('lightline-iceberg')    " カラースキーム
+    call dein#add('tyru/caw.vim')           " コメントON/OFF
+    call dein#add('dense-analysis/ale')     " 非同期構文チェッカ
+    call dein#add('maximbaz/lightline-ale') " ↑をlightlineで使うやつ
+call dein#end()
+" 未インストールプラグインのインストール
+if dein#check_install()
+    call dein#install()
+endif
+" カラースキームはインストール後じゃないとね…
+colorscheme iceberg
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""" 構文チェッカ(ALE)設定 """""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" See https://sinshutu-kibotu.hatenablog.jp/entry/2018/06/24/025319
+let g:ale_statusline_format = ['E%d', 'W%d', 'ok'] " 表示フォーマット
+let g:ale_sign_error        = '✗'                 " エラー時に表示するマーク
+let g:ale_sign_warning      = '⚠'                 " 警告時に表示するマーク
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""" lightlineの設定 """"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" See https://itchyny.hatenablog.com/entry/20130828/1377653592
+"     https://itchyny.hatenablog.com/entry/20130918/1379461406
+" なんかIcebergがうまく行かないので{'colorscheme': 'iceberg'}はお預けで
+let g:lightline = {
+    \ 'mode_map': {
+        \ 'c': 'NORMAL'
+    \ },
+    \ 'active': {
+        \ 'left': [
+            \ [ 'mode', 'paste' ],
+            \ [ 'filename' ],
+            \ [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
+        \ ],
+        \ 'right': [
+            \ [ 'lineinfo' ],
+            \ [ 'fileformat', 'fileencoding', 'filetype' ]
+        \ ]
+    \ },
+    \ 'component': {
+        \ 'lineinfo': '%l/%L:%-2v'
+    \ },
+    \ 'component_expand': {
+        \ 'linter_checking': 'lightline#ale#checking',
+        \ 'linter_warnings': 'lightline#ale#warnings',
+        \ 'linter_errors': 'lightline#ale#errors',
+        \ 'linter_ok': 'lightline#ale#ok',
+    \ },
+    \ 'component_type': {
+        \ 'linter_checking': 'left',
+        \ 'linter_warnings': 'warning',
+        \ 'linter_errors': 'error',
+        \ 'linter_ok': 'left',
+    \ },
+    \ 'component_function': {
+        \ 'modified': 'LightlineModified',
+        \ 'readonly': 'LightlineReadonly',
+        \ 'filename': 'LLFilename',
+        \ 'fileformat': 'LLFileFormat',
+        \ 'filetype': 'LLFileType',
+        \ 'fileencoding': 'LLFileEncoding',
+        \ 'mode': 'LLMode'
+    \ },
+\ }
+" ファイルの変更状態('+'/'-'/'')を返します
+" @return 変更されている場合は'+'、変更不可の場合は'-'、それ以外は''
+function! LightlineModified()
+    return (&ft =~? 'help\|vimfiler\|gundo') ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+" ファイルが変更権限('x'/'')を返します
+" @return 読込専用の場合は'x'、それ以外は''
+function! LightlineReadonly()
+  return (&ft !~? 'help\|vimfiler\|gundo') && &readonly ? 'x' : ''
+endfunction
+" よくわからないけどファイル名を返すやつ(多分)
+function! LLFilename()
+  return ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
+        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \  &ft == 'unite' ? unite#get_status_string() :
+        \  &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
+        \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
+endfunction
+" ファイルフォーマット(unix/dos/mac)を返します。
+function! LLFileFormat()
+  return winwidth(0) > 70 ? &fileformat  : ''
+endfunction
+" ファイル種別を返します。
+function! LLFileType()
+  return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+endfunction
+" ファイルのエンコーディングを返します。
+function! LLFileEncoding()
+  return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+endfunction
+" 現在のモード(NORMAL/INSERT/...)を返します。
+function! LLMode()
+  return winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""" 締めの設定 """"""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ファイル形式の検出を有効化する
+" このタイミングで以下が行われるため、.vimrcの最後の方にあるべき(多分)
+"   runtimepathにあるファイル形式別プラグインのロード
+"   runtimepathにあるファイル形式別インデントのロード
+filetype plugin indent on
