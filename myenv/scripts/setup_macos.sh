@@ -132,4 +132,4 @@ fi
 
 
 # 終わりに
-source "$here/setup_common_pre.bash"
+source "$here/setup_common_post.bash"
