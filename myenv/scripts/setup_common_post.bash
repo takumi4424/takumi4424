@@ -10,7 +10,9 @@ if ! [[ -L ~/.config/fish/conf.d/takumi4424.fish ]]; then
 fi
 # プラグインマネージャfisherのインストール
 if ! [[ -f ~/.config/fish/functions/fisher.fish ]]; then
-    curl https://git.io/fisher --create-dirs -sLo ~/.config/fish/functions/fisher.fish
+    # fisher_url='https://git.io/fisher'
+    fisher_url='https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish'
+    curl "$fisher_url" --create-dirs -sLo ~/.config/fish/functions/fisher.fish
 fi
 # 以下、いろんなプラグインのインストール
 function install_fisher_plugin() { fish -c "fisher list '$1'" >/dev/null || fish -c "fisher install '$1'"; }
