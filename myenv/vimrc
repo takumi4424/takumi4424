@@ -119,13 +119,13 @@ endif
 set runtimepath+=$VIM_DEIN
 " プラグインの管理
 call dein#begin($VIM_BUNDLES)
-    call dein#add($VIM_DEIN)                " let dein manage dein
-    call dein#add('itchyny/lightline.vim')  " かっこいいビジュアルで
-    call dein#add('cocopon/iceberg.vim')    " カラースキーム
-    call dein#add('lightline-iceberg')    " カラースキーム
-    call dein#add('tyru/caw.vim')           " コメントON/OFF
-    call dein#add('dense-analysis/ale')     " 非同期構文チェッカ
-    call dein#add('maximbaz/lightline-ale') " ↑をlightlineで使うやつ
+    call dein#add($VIM_DEIN)                      " let dein manage dein
+    call dein#add('itchyny/lightline.vim')        " かっこいいビジュアルで
+    call dein#add('cocopon/iceberg.vim')          " カラースキーム
+    call dein#add('hallzy/lightline-iceberg')     " lightlineで↑をうまくやるため
+    call dein#add('tyru/caw.vim')                 " コメントON/OFF
+    call dein#add('dense-analysis/ale')           " 非同期構文チェッカ
+    call dein#add('maximbaz/lightline-ale')       " ↑をlightlineで使うやつ
 call dein#end()
 " 未インストールプラグインのインストール
 if dein#check_install()
@@ -147,8 +147,8 @@ let g:ale_sign_warning      = '⚠'                 " 警告時に表示する�
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " See https://itchyny.hatenablog.com/entry/20130828/1377653592
 "     https://itchyny.hatenablog.com/entry/20130918/1379461406
-" なんかIcebergがうまく行かないので{'colorscheme': 'iceberg'}はお預けで
 let g:lightline = {
+    \ 'colorscheme': 'iceberg',
     \ 'mode_map': {
         \ 'c': 'NORMAL'
     \ },
