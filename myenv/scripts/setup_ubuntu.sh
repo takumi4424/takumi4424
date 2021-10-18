@@ -1,8 +1,9 @@
 #!/bin/bash
 set -eu
-
+# 共通の設定
 here="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
-tempdir="$(mktemp -d)"
+source "$here/setup_common_pre.bash"
+
 
 ################################################################################
 ################################### ホスト名 ###################################
@@ -12,7 +13,7 @@ tempdir="$(mktemp -d)"
 ############################## aptパッケージ関連 ###############################
 ################################################################################
 # Homebrewでインストールするソフトウェアのリスト
-apt_apps=(
+apt_pkgs=(
     fish
     docker-ce docker-ce-cli containerd.io
     dialog
@@ -31,15 +32,23 @@ if ! which docker >/dev/null; then
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 fi
-sudo apt update
-
-
-################################################################################
-################################### Fish関連 ###################################
-################################################################################
-# if [[ $(cat /etc/passwd | grep -E "^$(id -un):" | cut -d : -f 7) != $(which fish) ]]; then
-#     sudo chsh -s "$(which fish)" "$(id -un)"
-# fi
+# インストール済みリストの取得
+apt_installed=()
+while read pkg; do
+    apt_installed+=("$pkg")
+done < <(apt list --installed 2>/dev/null | cut -d '/' -f 1)
+# 未インストールソフトの抽出
+apt_not_installed=()
+for pkg in "${apt_pkgs[@]}"; do
+    if ! array_contains "$pkg" "${apt_installed[@]+"${apt_installed[@]}"}"; then
+        apt_not_installed+=("$pkg")
+    fi
+done
+# 未インストールソフトのインストール
+if (( ${#apt_not_installed[@]} > 0 )); then
+    sudo apt update
+    sudo apt install "${apt_not_installed[@]}"
+fi
 
 ################################################################################
 ################################# フォント関連 #################################
@@ -75,6 +84,13 @@ if ! dconf list "$profiles/" | grep "$uuid" >/dev/null; then
     # デフォルトを{uuid: $uuid}に設定
     dconf write "$profiles/default" "'$uuid'"
 fi
+
+################################################################################
+################################### Fish関連 ###################################
+################################################################################
+# if [[ $(cat /etc/passwd | grep -E "^$(id -un):" | cut -d : -f 7) != $(which fish) ]]; then
+#     sudo chsh -s "$(which fish)" "$(id -un)"
+# fi
 
 
 

@@ -8,7 +8,7 @@ source "$here/setup_common_pre.bash"
 ################################# Homebrew関連 #################################
 ################################################################################
 # Homebrewでインストールするソフトウェアのリスト
-brew_apps=(
+brew_pkgs=(
     fish
     docker
     dialog
@@ -23,7 +23,7 @@ fi
 brew_installed=( $(brew list) )
 # 未インストールソフトの抽出
 brew_not_installed=()
-for app in "${brew_apps[@]}"; do
+for app in "${brew_pkgs[@]}"; do
     if ! array_contains "$app" "${brew_installed[@]+"${brew_installed[@]}"}"; then
         brew_not_installed+="$app"
     fi
@@ -38,18 +38,6 @@ fi
 ################################################################################
 echo '.DS_Store' > ~/.gitignore_global
 git config --global core.excludesfile ~/.gitignore_global
-
-################################################################################
-################################### Fish関連 ###################################
-################################################################################
-# pattern="UserShell: $(which fish)"
-# if ! [[ $(dscl . -read /Users/$USER UserShell) =~ ^$pattern$ ]]; then
-#     # デフォルトシェルがfishじゃない場合はセットアップ
-#     if ! cat /etc/shells | grep -E "^$(which fish)$" >/dev/null; then
-#         echo "$(which fish)" | sudo tee -a /etc/shells >/dev/null
-#     fi
-#     chsh -s "$(which fish)"
-# fi
 
 ################################################################################
 ################################# フォント関連 #################################
@@ -128,6 +116,18 @@ elif [[ $(shasum -a 512 "$targetdir/$fname" | cut -f 1 -d ' ') != $(shasum -a 51
     # ファイルの内容が違う
     cp "$resourcedir/$fname" "$targetdir"
 fi
+
+################################################################################
+################################### Fish関連 ###################################
+################################################################################
+# pattern="UserShell: $(which fish)"
+# if ! [[ $(dscl . -read /Users/$USER UserShell) =~ ^$pattern$ ]]; then
+#     # デフォルトシェルがfishじゃない場合はセットアップ
+#     if ! cat /etc/shells | grep -E "^$(which fish)$" >/dev/null; then
+#         echo "$(which fish)" | sudo tee -a /etc/shells >/dev/null
+#     fi
+#     chsh -s "$(which fish)"
+# fi
 
 
 
