@@ -75,15 +75,12 @@ fi
 # このUUIDはてきとう
 uuid='9fd90481-da24-477a-955c-6797762f19d4'
 profiles='/org/gnome/terminal/legacy/profiles:'
-if ! dconf list "$profiles/" | grep "$uuid" >/dev/null; then
-    # gterminal.preferencesがない場合
-    # gterminal.preferencesをシステムに追加(uuid: $uuid)
-    dconf load "$profiles/:$uuid/" < "$resourcedir/gterminal.preferences"
-    # プロファイルリストに追加
-    dconf write "$profiles/list" "$(dconf read $profiles/list | tr "'" '"' | jq -c ". += [\"$uuid\"]" | tr '"' "'")"
-    # デフォルトを{uuid: $uuid}に設定
-    dconf write "$profiles/default" "'$uuid'"
-fi
+# gterminal.preferencesをシステムに追加(uuid: $uuid)
+dconf load "$profiles/:$uuid/" < "$resourcedir/gterminal.preferences"
+# $uuidをリストに追加した上で重複を削除
+dconf write "$profiles/list" "$(dconf read $profiles/list | tr "'" '"' | jq ". += [\"$uuid\"]" | jq ". | unique" | tr '"' "'")"
+# デフォルトを{uuid: $uuid}に設定
+dconf write "$profiles/default" "'$uuid'"
 
 ################################################################################
 ################################### Fish関連 ###################################
