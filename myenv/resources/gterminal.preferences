@@ -1,6 +1,11 @@
 [/]
+background-color='rgb(22,24,33)'
+bold-color='rgb(198,200,209)'
 custom-command='/usr/bin/fish'
 font='HackGen 12'
+foreground-color='rgb(198,200,209)'
+palette=['rgb(22,24,33)', 'rgb(226,120,120)', 'rgb(180,190,130)', 'rgb(226,164,120)', 'rgb(132,160,198)', 'rgb(160,147,199)', 'rgb(137,184,194)', 'rgb(198,200,209)', 'rgb(107,112,137)', 'rgb(233,137,137)', 'rgb(192,202,142)', 'rgb(233,177,137)', 'rgb(145,172,209)', 'rgb(173,160,211)', 'rgb(149,196,206)', 'rgb(210,212,222)']
 use-custom-command=true
 use-system-font=false
+use-theme-colors=false
 visible-name='takumi4424'
