@@ -18,6 +18,8 @@ apt_pkgs=(
     docker-ce docker-ce-cli containerd.io
     dialog
     jq
+    xdg-utils
+    xsel
 )
 # 準備
 if ! which fish >/dev/null; then sudo apt-add-repository ppa:fish-shell/release-3; fi
