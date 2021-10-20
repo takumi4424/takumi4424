@@ -77,6 +77,21 @@ echo "newly installed:"
 for pkg in "${brew_not_installed[@]+"${brew_not_installed[@]}"}"; do
     echo "  - $pkg"
 done
+################################################################################
+start_installing 'LIMA' ########################################################
+################################################################################
+if ! grep 'Host lima-docker' ~/.ssh/config >/dev/null 2>&1; then
+    {
+        echo 'Host lima-docker'
+        echo '    NoHostAuthenticationForLocalhost yes'
+        echo '    HostName 127.0.0.1'
+        echo '    Port 60022'
+        echo '    IdentityFile ~/.lima/_config/user'
+    } >> ~/.ssh/config
+    echo 'edited: ~/.ssh/config: Host lima-docker appended'
+else
+    echo 'not edited: ~/.ssh/config: Host lima-docker already exists'
+fi
 
 ################################################################################
 start_installing 'Git Configurations for MacOS' ################################
@@ -87,9 +102,9 @@ if ! [[ -d ~/.config/git ]]; then
 fi
 if ! grep '.DS_Store' ~/.config/git/ignore >/dev/null 2>&1; then
     echo '.DS_Store' >> ~/.config/git/ignore
-    echo 'edited: ~/.config/git/ignore (".DS_Store" appended)'
+    echo 'edited: ~/.config/git/ignore: ".DS_Store" appended'
 else
-    echo 'not edited: ".DS_Store" already in ~/.config/git/ignore'
+    echo 'edited: ~/.config/git/ignore: ".DS_Store" already exists'
 fi
 
 ################################################################################

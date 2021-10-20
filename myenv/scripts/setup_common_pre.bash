@@ -56,6 +56,7 @@ bindir="$(cd "$here"/../bin; pwd)"
 # いろんな設定用リソース置き場
 resourcedir="$(cd "$here"/../resources; pwd)"
 dotfiledir="$(cd "$here"/../dotfiles; pwd)"
+fish_conf_d="$(cd "$here"/../config/fish/conf.d; pwd)"
 
 # セットアップに使用する一時ディレクトリの作成
 if ! tempdir="$(mktemp -d)"; then
