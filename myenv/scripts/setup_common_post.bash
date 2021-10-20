@@ -6,8 +6,8 @@ if ! [[ -d ~/.config/fish/conf.d ]]; then
     echo 'created: ~/.config/fish/conf.d'
 fi
 # 設定ファイルをシンボリックリンクとして配置
-ln -sf "$fish_conf_d/takumi4424.fish" ~/.config/fish/conf.d/takumi4424.fish
-echo "creted: symbolic link: ~/.config/fish/conf.d/takumi4424.fish -> $dotfiledir/takumi4424.fish"
+ln -sf "$dotfiles/takumi4424.fish" ~/.config/fish/conf.d/takumi4424.fish
+echo "creted: symbolic link: ~/.config/fish/conf.d/takumi4424.fish -> $dotfiles/takumi4424.fish"
 # プラグインマネージャfisherのインストール
 if ! [[ -f ~/.config/fish/functions/fisher.fish ]]; then
     # fisher_url='https://git.io/fisher'
@@ -27,6 +27,20 @@ function install_fisher_plugin() {
     fi
 }
 install_fisher_plugin oh-my-fish/theme-bobthefish
+
+################################################################################
+start_installing "bash-shell configurations" ###################################
+################################################################################
+appendix="if [ -f '$dotfiles/bashrc' ]; then . '$dotfiles/bashrc'; fi"
+if ! grep "$appendix" ~/.bash_profile >/dev/null 2>&1; then
+    {
+        echo ""
+        echo "$appendix"
+    } >> ~/.bash_profile
+    echo 'edited: ~/.bash_profile'
+else
+    echo 'not edited: ~/.bash_profile: already configured'
+fi
 
 ################################################################################
 start_installing 'Git Common Configurations' ###################################
@@ -56,8 +70,8 @@ fi
 ################################################################################
 start_installing "vim" #########################################################
 ################################################################################
-ln -sf "$dotfiledir/vimrc" ~/.vimrc
-echo "creted: symbolic link: ~/.vimrc -> '$dotfiledir/vimrc'"
+ln -sf "$dotfiles/vimrc" ~/.vimrc
+echo "creted: symbolic link: ~/.vimrc -> '$dotfiles/vimrc'"
 
 
 start_installing 'successfully finished!'

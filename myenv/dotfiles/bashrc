@@ -1,0 +1,9 @@
+export PATH="$HOME/.takumi4424/myenv/bin:$PATH"
+
+if [[ $(uname -s) = 'Darwin' ]]; then
+    alias lima_start_docker='limactl start ~/.takumi4424/myenv/lima/docker.yaml'
+    export DOCKER_HOST='ssh://lima-docker'
+elif grep 'NAME="Ubuntu"'; then
+    alias open='xdg-open'
+    alias pbcopy='xsel --clipboard --input'
+fi
