@@ -14,13 +14,19 @@ source "$here/setup_common_pre.bash"
 ################################################################################
 # Homebrewでインストールするソフトウェアのリスト
 apt_pkgs=(
-    fish
-    docker-ce docker-ce-cli containerd.io
+    containerd.io # docker
     dialog
+    docker-ce     # docker
+    docker-ce-cli # docker
+    fish
     jq
     xdg-utils
     xsel
 )
+for pkg in "${apt_pkgs[@]}"; do
+    echo "$pkg"
+done
+exit
 # 準備
 if ! which fish >/dev/null; then sudo apt-add-repository ppa:fish-shell/release-3; fi
 if ! which docker >/dev/null; then

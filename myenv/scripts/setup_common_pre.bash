@@ -4,18 +4,33 @@
 # 指定された引数をすべてエラー出力し、スクリプトを終了します。
 # usage: abort [ERROR_MESSAGE]...
 function abort() {
+    local arg
     if (( $# > 0 )); then for arg in "$@"; do printf '%s\n' "$arg" >&2; done; fi
     exit 1
 }
 
 # 指定された値が配列に含まれるかどうかをチェックします。
 function array_contains() {
-    local target="$1"
-    shift
-    local element
-    # inが無いforは暗黙的に引数を繰り返す
-    for element; do [[ $element == $target ]] && return 0; done
+    local __arr__ elem
+    eval __arr__=("\"\${$1[@]+\"\${$1[@]}\"}\"")
+    for elem in "${__arr__[@]+"${__arr__[@]}"}"; do [[ $elem == $2 ]] && return 0; done
     return 1
+}
+
+function start_installing() {
+    local cols linelen_l linelen_r
+    # cols="$(tput cols)"
+    cols="80"
+    linelen_l="$(( (cols - ${#1} - 2) / 2 ))"
+    linelen_r="$(( cols - ${#1} -2 - linelen_l ))"
+    printf -- "${2:-#}%.s" $(seq ${linelen_l})
+    printf -- ' %s ' "$1"
+    printf -- "${2:-#}%.s" $(seq ${linelen_r})
+    echo
+}
+
+function start_installing_sub() {
+    start_installing "$1" '-'
 }
 
 # # 指定されたバージョン文字列の、メジャーバージョン部分を整数として主力します。
@@ -40,6 +55,7 @@ here="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 bindir="$(cd "$here"/../bin; pwd)"
 # いろんな設定用リソース置き場
 resourcedir="$(cd "$here"/../resources; pwd)"
+dotfiledir="$(cd "$here"/../dotfiles; pwd)"
 
 # セットアップに使用する一時ディレクトリの作成
 if ! tempdir="$(mktemp -d)"; then
@@ -47,12 +63,3 @@ if ! tempdir="$(mktemp -d)"; then
 fi
 # 終了時に一時ディレクトリを削除する
 trap 'rm -rf "$tempdir"' 0 1 2 3 15
-
-################################################################################
-################################### Git関連 ####################################
-################################################################################
-if ! git config --list --global >/dev/null 2>&1; then
-    git config --global user.email '57510056+takumi4424@users.noreply.github.com'
-    git config --global user.name 'Takumi Kodama'
-    git config --global core.autocrlf false
-fi
