@@ -12,7 +12,7 @@ echo "creted: symbolic link: ~/.config/fish/conf.d/takumi4424.fish -> $dotfiles/
 if ! [[ -f ~/.config/fish/functions/fisher.fish ]]; then
     # fisher_url='https://git.io/fisher'
     fisher_url='https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish'
-    curl "$fisher_url" --create-dirs -sLo ~/.config/fish/functions/fisher.fish
+    fish -c "curl -sL '$fisher_url' | source && fisher install jorgebucaran/fisher"
     echo 'installed: fisher'
 else
     echo 'not installed: fisher: already installed'
