@@ -30,11 +30,10 @@ source "$here/setup_common_pre.bash"
 # dscacheutil -flushcache
 
 ################################################################################
-start_installing 'Homebrew' ####################################################
+start_installing 'Homebrew packages' ###########################################
 ################################################################################
-brew_installed_flag=false
 # Homebrewでインストールするソフトウェアのリスト
-brew_pkgs=(
+pkgs=(
     fish
     dialog
     docker
@@ -45,38 +44,56 @@ brew_pkgs=(
 # Homebrew自体のインストール
 if ! which brew >/dev/null; then
     start_installing_sub "installing homebrew itself..."
-    brew_installed_flag=true
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    echo '----------------'
 fi
 
 # インストール済みソフトウェアの確認
-brew_installed=( $(brew list) )
+installed_pkgs=( $(brew list) )
 # 未インストールソフトの抽出
-brew_not_installed=()
-for pkg in "${brew_pkgs[@]}"; do
-    array_contains 'brew_installed' "$pkg" || brew_not_installed+=("$pkg")
-done
-# brew_pkgsのうちインストール済みのものを抽出(最後に表示するために使用)
-brew_installed=()
-for pkg in "${brew_pkgs[@]}"; do
-    array_contains 'brew_not_installed' "$pkg" || brew_installed+=("$pkg")
+uninstalled_pkgs=()
+for pkg in "${pkgs[@]}"; do
+    array_contains 'installed_pkgs' "$pkg" || uninstalled_pkgs+=("$pkg")
 done
 
 # 未インストールソフトのインストール
-if (( ${#brew_not_installed[@]} > 0 )); then
-    start_installing_sub "isntalling packages..."
-    brew install "${brew_not_installed[@]}"
+if (( ${#uninstalled_pkgs[@]} > 0 )); then
+    start_installing_sub "installing brew packages..."
+    brew install "${uninstalled_pkgs[@]}"
+    echo '----------------'
 fi
+
 # インストールの実施状態表示
-if ${brew_installed_flag}; then start_installing_sub "summary"; fi
-echo "already installed:"
-for pkg in "${brew_installed[@]+"${brew_installed[@]}"}"; do
-    echo "  - $pkg"
+for pkg in "${pkgs[@]}"; do
+    if array_contains 'installed_pkgs' "$pkg"; then
+        echo "not installed: $pkg: already installed"
+    else
+        echo "installed: $pkg"
+    fi
 done
-echo "newly installed:"
-for pkg in "${brew_not_installed[@]+"${brew_not_installed[@]}"}"; do
-    echo "  - $pkg"
-done
+
+################################################################################
+start_installing 'Fonts' #######################################################
+################################################################################
+# 白源
+if ! [[ -d /Library/Fonts/HackGen ]]; then
+    url='https://github.com/yuru7/HackGen/releases'
+    pattern="<html><body>You are being <a href=\"$url/tag/(.+)\">redirected</a>\.</body></html>"
+    if [[ $(curl -s $url/latest) =~ ^$pattern$ ]]; then
+        # 最新のHackGenフォントをダウンロード
+        version="${BASH_REMATCH[1]}"
+        curl -Lo "$tempdir/HackGen.zip" "$url/download/$version/HackGen_$version.zip"
+        unzip "$tempdir/HackGen.zip" -d "$tempdir"
+        mv "$tempdir/HackGen_$version" /Library/Fonts/HackGen
+        echo '---'
+        echo 'successfully installed.'
+    else
+        abort 'Error: Failed to install HackGen font...'
+    fi
+else
+    echo 'already installed.'
+fi
+
 ################################################################################
 start_installing 'LIMA' ########################################################
 ################################################################################
@@ -105,28 +122,6 @@ if ! grep '.DS_Store' ~/.config/git/ignore >/dev/null 2>&1; then
     echo 'edited: ~/.config/git/ignore: ".DS_Store" appended'
 else
     echo 'edited: ~/.config/git/ignore: ".DS_Store" already exists'
-fi
-
-################################################################################
-start_installing 'Fonts' #######################################################
-################################################################################
-# 白源
-if ! [[ -d /Library/Fonts/HackGen ]]; then
-    url='https://github.com/yuru7/HackGen/releases'
-    pattern="<html><body>You are being <a href=\"$url/tag/(.+)\">redirected</a>\.</body></html>"
-    if [[ $(curl -s $url/latest) =~ ^$pattern$ ]]; then
-        # 最新のHackGenフォントをダウンロード
-        version="${BASH_REMATCH[1]}"
-        curl -Lo "$tempdir/HackGen.zip" "$url/download/$version/HackGen_$version.zip"
-        unzip "$tempdir/HackGen.zip" -d "$tempdir"
-        mv "$tempdir/HackGen_$version" /Library/Fonts/HackGen
-        echo '---'
-        echo 'successfully installed.'
-    else
-        abort 'Error: Failed to install HackGen font...'
-    fi
-else
-    echo 'already installed.'
 fi
 
 ################################################################################
