@@ -1,0 +1,38 @@
+#!/bin/bash
+
+function usage() {
+    echo "usage: git list-gone-branch [--help] [--without-current]"
+}
+
+function abort() {
+    echo "error: $1"
+    usage
+    exit 1
+}
+
+for arg in "$@"; do
+    if [[ $arg =~ ^(-h|--help)$ ]]; then
+        echo "Display all branches removed from remote."
+        echo "Run 'git remote prune origin' or 'git fetch/pull --prune' before running this."
+        echo ""
+        usage
+        exit
+    elif [[ $arg == '--without-current' ]]; then
+        without_current=true
+    else
+        abort "unknown argument '$arg'"
+    fi
+done
+
+while read -r line; do
+    if [[ $line =~ ^\*[[:space:]](.+)$  ]]; then
+        # 現在のブランチ('* 'から始まる)
+        ${without_current:-false} && continue
+        line="${BASH_REMATCH[1]}"
+    fi
+
+    if [[ $line =~ ^([^[:space:]]+)[[:space:]]+[0-9a-f]+[[:space:]]+\[origin/([^[:space:]]+):[[:space:]]+gone\] ]]; then
+        # リモートから消えたブランチ('<hash> <hash> [origin/<hash>: gone] <commit_message>')
+        echo "${BASH_REMATCH[1]}"
+    fi
+done < <(git branch -vv)
