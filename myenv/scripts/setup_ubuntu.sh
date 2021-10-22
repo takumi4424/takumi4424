@@ -12,6 +12,8 @@ source "$here/setup_common_pre.bash"
 ################################################################################
 ######################### apt package インストール準備 #########################
 ################################################################################
+function install_gpg() { curl -fsSL "$1" | sudo gpg --dearmor -o "/etc/apt/trusted.gpg.d/$2"; }
+function deb_option() { echo "arch=$(dpkg --print-architecture)${1:+ signed-by=/etc/apt/trusted.gpg.d/$1}"; }
 # 準備(fish)
 if ! which fish >/dev/null; then
     sudo apt-add-repository ppa:fish-shell/release-3
@@ -20,29 +22,29 @@ fi
 if ! which docker >/dev/null; then
     # 依存パッケージインストール
     sudo apt update
-    sudo apt install -y \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        gnupg \
-        lsb-release
+    sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
     # リポジトリと鍵のインストール
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    install_gpg https://download.docker.com/linux/ubuntu/gpg download.docker.gpg
+    echo "deb [$(deb_option download.docker.gpg)] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 fi
 # 準備(VSCode)
 if ! which code >/dev/null; then
     # 依存パッケージインストール
     sudo apt update
-    sudo apt install -y \
-        apt-transport-https \
-        curl \
-        gnupg
+    sudo apt install -y apt-transport-https curl gnupg
     # リポジトリと鍵のインストール
-    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/packages.microsoft.gpg
-    echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
+    install_gpg https://packages.microsoft.com/keys/microsoft.asc packages.microsoft.gpg
+    echo "deb [$(deb_option packages.microsoft.gpg)] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
 fi
-
+# 準備(GoogleChrome)
+if ! which google-chrome >/dev/null; then
+    # 依存パッケージインストール
+    sudo apt update
+    sudo apt install -y apt-transport-https curl gnupg
+    # リポジトリと鍵のインストール
+    install_gpg https://dl-ssl.google.com/linux/linux_signing_key.pub dl-ssl.google.gpg
+    echo "deb [$(deb_option dl-ssl.google.gpg)] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list >/dev/null
+fi
 ################################################################################
 start_installing 'Homebrew packages' ###########################################
 ################################################################################
@@ -54,6 +56,7 @@ pkgs=(
     docker-ce     # docker
     docker-ce-cli # docker
     fish
+    google-chrome-stable
     jq
     xdg-utils
     xsel
