@@ -117,10 +117,12 @@ start_installing 'Other Applications' ##########################################
 # このUUIDはてきとう
 uuid='9fd90481-da24-477a-955c-6797762f19d4'
 profiles='/org/gnome/terminal/legacy/profiles:'
+list="$(dconf read $profiles/list)"
+if [[ -z $list ]]; then list="[]"; fi
 # gterminal.preferencesをシステムに追加(uuid: $uuid)
 dconf load "$profiles/:$uuid/" < "$resourcedir/gterminal.preferences"
 # $uuidをリストに追加した上で重複を削除
-dconf write "$profiles/list" "$(dconf read $profiles/list | tr "'" '"' | jq ". += [\"$uuid\"]" | jq ". | unique" | tr '"' "'")"
+dconf write "$profiles/list" "$(echo "$list" | tr "'" '"' | jq ". += [\"$uuid\"]" | jq ". | unique" | tr '"' "'")"
 # デフォルトを{uuid: $uuid}に設定
 dconf write "$profiles/default" "'$uuid'"
 echo 'installed: tereminal profile (9fd90481-da24-477a-955c-6797762f19d4)'
