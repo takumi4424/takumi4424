@@ -4,23 +4,19 @@ function usage() {
     echo "usage: git list-gone-branch [--help] [--without-current]"
 }
 
-function abort() {
-    echo "error: $1"
-    usage
-    exit 1
-}
-
 for arg in "$@"; do
     if [[ $arg =~ ^(-h|--help)$ ]]; then
         echo "Display all branches removed from remote."
         echo "Run 'git remote prune origin' or 'git fetch/pull --prune' before running this."
         echo ""
         usage
-        exit
+        exit 0
     elif [[ $arg == '--without-current' ]]; then
         without_current=true
     else
-        abort "unknown argument '$arg'"
+        abort "error: unknown argument '$arg'"
+        usage
+        exit 1
     fi
 done
 

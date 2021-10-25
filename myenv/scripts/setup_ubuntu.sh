@@ -46,9 +46,9 @@ if ! which google-chrome >/dev/null; then
     echo "deb [$(deb_option dl-ssl.google.gpg)] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list >/dev/null
 fi
 ################################################################################
-start_installing 'Homebrew packages' ###########################################
+start_installing 'apt packages' ################################################
 ################################################################################
-# Homebrewでインストールするソフトウェアのリスト
+# aptでインストールするソフトウェアのリスト
 pkgs=(
     code
     containerd.io # docker
@@ -102,7 +102,7 @@ if ! [[ -d /usr/share/fonts/HackGen ]]; then
         version="${BASH_REMATCH[1]}"
         curl -Lo "$tempdir/HackGen.zip" "$url/download/$version/HackGen_$version.zip"
         unzip "$tempdir/HackGen.zip" -d "$tempdir"
-        mv "$tempdir/HackGen_$version" /usr/share/fonts/HackGen
+        sudo mv "$tempdir/HackGen_$version" /usr/share/fonts/HackGen
         echo '---'
         echo 'successfully installed.'
     else
@@ -120,10 +120,12 @@ start_installing 'Other Applications' ##########################################
 # このUUIDはてきとう
 uuid='9fd90481-da24-477a-955c-6797762f19d4'
 profiles='/org/gnome/terminal/legacy/profiles:'
+list="$(dconf read $profiles/list)"
+if [[ -z $list ]]; then list="[]"; fi
 # gterminal.preferencesをシステムに追加(uuid: $uuid)
 dconf load "$profiles/:$uuid/" < "$resourcedir/gterminal.preferences"
 # $uuidをリストに追加した上で重複を削除
-dconf write "$profiles/list" "$(dconf read $profiles/list | tr "'" '"' | jq ". += [\"$uuid\"]" | jq ". | unique" | tr '"' "'")"
+dconf write "$profiles/list" "$(echo "$list" | tr "'" '"' | jq ". += [\"$uuid\"]" | jq ". | unique" | tr '"' "'")"
 # デフォルトを{uuid: $uuid}に設定
 dconf write "$profiles/default" "'$uuid'"
 echo 'installed: tereminal profile (9fd90481-da24-477a-955c-6797762f19d4)'
