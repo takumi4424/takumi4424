@@ -99,7 +99,7 @@ if ! [[ -d /usr/share/fonts/HackGen ]]; then
         version="${BASH_REMATCH[1]}"
         curl -Lo "$tempdir/HackGen.zip" "$url/download/$version/HackGen_$version.zip"
         unzip "$tempdir/HackGen.zip" -d "$tempdir"
-        mv "$tempdir/HackGen_$version" /usr/share/fonts/HackGen
+        sudo mv "$tempdir/HackGen_$version" /usr/share/fonts/HackGen
         echo '---'
         echo 'successfully installed.'
     else
