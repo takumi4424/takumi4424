@@ -1,0 +1,34 @@
+#!/bin/bash
+set -eu
+
+function usage() {
+    echo 'usage: code-container CONTAINER_NAME...'
+}
+
+names=()
+for arg in "$@"; do
+    if [[ $arg =~ ^(-h|--help)$ ]]; then
+        usage
+        echo 'Launch VSCode attaching to the given container(s).'
+        exit 0
+    elif [[ -z $(docker ps -aq -f name="$arg") ]]; then
+        echo "error: '$arg': No such a container."
+        usage
+        exit 1
+    else
+        names+=("$arg")
+    fi
+done
+
+if (( ${#names[@]} == 0 )); then
+    echo "error: No container name given."
+    usage
+    exit 1
+fi
+
+for name in "${names[@]}"; do
+    hexname="$(printf "$name" | od -A n -t x1 | tr -d '[\n\t ]')"
+    workdir="$(docker inspect -f '{{ .Config.WorkingDir  }}' "$name")"
+    uri="vscode-remote://attached-container+$hexname$workdir"
+    code --folder-uri "$uri"
+done

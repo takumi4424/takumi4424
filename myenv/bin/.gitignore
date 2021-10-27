@@ -1,4 +1,5 @@
 **
 !/.gitignore
+!/code-container
 !/git-list-gone-branch
 !/git-rm-gone-branch
