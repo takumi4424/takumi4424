@@ -17,5 +17,6 @@ end
 
 # コマンド補完設定(code-container)
 if which code >/dev/null && which docker >/dev/null
-    complete -c code-container -d 'Container' -x -a '(docker ps -a --format "{{.Names}}")'
+    complete -c code-container -d '✔ Container' -x -a '(docker ps --format "{{.Names}}")'
+    complete -c code-container -d '⚠ Container' -x -a '(docker ps --format "{{.Names}}" -a --filter "status=exited")'
 end
