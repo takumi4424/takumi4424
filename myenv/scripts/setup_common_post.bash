@@ -32,7 +32,7 @@ install_fisher_plugin oh-my-fish/theme-bobthefish
 start_installing "bash-shell configurations" ###################################
 ################################################################################
 appendix="if [ -f '$dotfiles/bashrc' ]; then . '$dotfiles/bashrc'; fi"
-if ! grep "$appendix" ~/.bash_profile >/dev/null 2>&1; then
+if ! grep -F "$appendix" ~/.bash_profile >/dev/null 2>&1; then
     {
         echo ""
         echo "$appendix"
