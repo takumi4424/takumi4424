@@ -29,6 +29,5 @@ fi
 for name in "${names[@]}"; do
     hexname="$(printf "$name" | od -A n -t x1 | tr -d '[\n\t ]')"
     workdir="$(docker inspect -f '{{ .Config.WorkingDir  }}' "$name")"
-    uri="vscode-remote://attached-container+$hexname$workdir"
-    code --folder-uri "$uri"
+    code --remote=attached-container+$hexname "$workdir"
 done
