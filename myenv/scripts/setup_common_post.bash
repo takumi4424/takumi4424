@@ -5,9 +5,11 @@ if ! [[ -d ~/.config/fish/conf.d ]]; then
     mkdir -p ~/.config/fish/conf.d
     echo 'created: ~/.config/fish/conf.d'
 fi
+
 # 設定ファイルをシンボリックリンクとして配置
 ln -sf "$dotfiles/takumi4424.fish" ~/.config/fish/conf.d/takumi4424.fish
 echo "creted: symbolic link: ~/.config/fish/conf.d/takumi4424.fish -> $dotfiles/takumi4424.fish"
+
 # プラグインマネージャfisherのインストール
 if ! [[ -f ~/.config/fish/functions/fisher.fish ]]; then
     # fisher_url='https://git.io/fisher'
@@ -17,7 +19,8 @@ if ! [[ -f ~/.config/fish/functions/fisher.fish ]]; then
 else
     echo 'not installed: fisher: already installed'
 fi
-# 以下、いろんなプラグインのインストール
+
+# 指定された名前のfisherプラグインをインストールします
 function install_fisher_plugin() {
     if ! fish -c "fisher list '$1'" >/dev/null; then
         fish -c "fisher install '$1'"
@@ -26,21 +29,47 @@ function install_fisher_plugin() {
         echo "not installed: fisher plugin: $1: already installed"
     fi
 }
+# 以下、いろんなfisherプラグインのインストール
 install_fisher_plugin oh-my-fish/theme-bobthefish
+
+# 指定されたfish補完スクリプトをインストールします
+function install_fish_completion() {
+    curl -fsSL "$1" --create-dirs -o ~/.config/fish/completions/"$(basename $1)"
+}
+# 以下、いろんなfish補完スクリプトのインストール
+install_fish_completion https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/fish/docker.fish
+install_fish_completion https://raw.githubusercontent.com/docker/compose/master/contrib/completion/fish/docker-compose.fish
 
 ################################################################################
 start_installing "bash-shell configurations" ###################################
 ################################################################################
-appendix="if [ -f '$dotfiles/bashrc' ]; then . '$dotfiles/bashrc'; fi"
-if ! grep -F "$appendix" ~/.bash_profile >/dev/null 2>&1; then
-    {
-        echo ""
-        echo "$appendix"
-    } >> ~/.bash_profile
-    echo 'edited: ~/.bash_profile'
-else
-    echo 'not edited: ~/.bash_profile: already configured'
-fi
+function check_and_append() {
+    local appendix="if [ -f '$1' ]; then . '$1'; fi"
+    if ! grep -F "$appendix" "$2" >/dev/null 2>&1; then
+        {
+            echo ""
+            echo "# source configuration from takumi4424"
+            echo "$appendix"
+        } >> "$2"
+        echo "edited: $2"
+    else
+        echo "not edited: $2: already configured"
+    fi
+}
+check_and_append "$dotfiles/bashrc"       ~/.bashrc
+check_and_append "$dotfiles/bash_profile" ~/.bash_profile
+
+# 指定されたbash補完スクリプトをインストールします
+function install_bash_completion() {
+    if   $is_macos;  then curl -fsSL "$1" --create-dirs -o "/usr/local/etc/bash_completion.d/$(basename $1)"
+    elif $is_ubuntu; then curl -fsSL "$1" --create-dirs -o "/etc/bash_completion.d/$(basename $1)"
+    else
+        abort 'Error: Unknown platform.'
+    fi
+}
+# 以下、いろんなbash補完スクリプトのインストール
+install_bash_completion https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker
+install_bash_completion https://raw.githubusercontent.com/docker/compose/master/contrib/completion/bash/docker-compose
 
 ################################################################################
 start_installing 'Git Common Configurations' ###################################

@@ -57,6 +57,17 @@ bindir="$(cd "$here"/../bin; pwd)"
 resourcedir="$(cd "$here"/../resources; pwd)"
 dotfiles="$(cd "$here"/../dotfiles; pwd)"
 
+################################################################################
+#################################### OS識別 ####################################
+################################################################################
+is_macos=false
+is_ubuntu=false
+if   [[ $(uname -s) = 'Darwin' ]];                    then is_macos=true
+elif grep 'NAME="Ubuntu"' /etc/os-release >/dev/null; then is_ubuntu=true
+else
+    abort 'Error: Unknown platform.'
+fi
+
 # セットアップに使用する一時ディレクトリの作成
 if ! tempdir="$(mktemp -d)"; then
     abort 'Error: Failed to create a temporary working directory.'

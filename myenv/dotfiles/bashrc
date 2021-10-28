@@ -1,14 +1,6 @@
-# プログラム置き場
-export TAKUMI4424_BIN=~/.takumi4424/myenv/bin
-# パス通す(重複を防ぎつつ)
-if ! echo "$PATH" | grep -F "$TAKUMI4424_BIN" >/dev/null; then
-    export PATH="$TAKUMI4424_BIN:$PATH"
-fi
-
-if [[ $(uname -s) = 'Darwin' ]]; then :
+if [[ $(uname -s) = 'Darwin' ]]; then
     # MacOS用設定
-    # alias lima_start_docker='limactl start ~/.takumi4424/myenv/lima/docker.yaml'
-    # export DOCKER_HOST='ssh://lima-docker'
+    . /usr/local/etc/bash_completion
 elif grep 'NAME="Ubuntu"' /etc/os-release >/dev/null; then
     # Ubuntu用設定
     alias open='xdg-open'
