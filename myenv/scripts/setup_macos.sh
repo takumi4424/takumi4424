@@ -36,7 +36,6 @@ start_installing 'Homebrew packages' ###########################################
 pkgs=(
     fish
     dialog
-    docker
     jq
     lima
 )
@@ -130,6 +129,7 @@ start_installing 'System Preferences' ##########################################
 # Dock関連
 echo '- Dock'
 defaults write com.apple.dock autohide -bool true               # Dockを自動的に表示/非表示
+defaults write com.apple.dock show-recents -bool false          # 最近使ったアプリケーションをDockに表示しない
 # トラックパッドの右下隅をクリックで副ボタンのクリック
 echo '- Trackpad'
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
