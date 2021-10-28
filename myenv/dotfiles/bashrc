@@ -1,9 +1,22 @@
-export PATH="$HOME/.takumi4424/myenv/bin:$PATH"
+# プログラム置き場
+export TAKUMI4424_BIN=~/.takumi4424/myenv/bin
+# パス通す(重複を防ぎつつ)
+if ! echo "$PATH" | grep -F "$TAKUMI4424_BIN" >/dev/null; then
+    export PATH="$TAKUMI4424_BIN:$PATH"
+fi
 
-if [[ $(uname -s) = 'Darwin' ]]; then
-    alias lima_start_docker='limactl start ~/.takumi4424/myenv/lima/docker.yaml'
-    export DOCKER_HOST='ssh://lima-docker'
-elif grep 'NAME="Ubuntu"'; then
+if [[ $(uname -s) = 'Darwin' ]]; then :
+    # MacOS用設定
+    # alias lima_start_docker='limactl start ~/.takumi4424/myenv/lima/docker.yaml'
+    # export DOCKER_HOST='ssh://lima-docker'
+elif grep 'NAME="Ubuntu"' /etc/os-release >/dev/null; then
+    # Ubuntu用設定
     alias open='xdg-open'
     alias pbcopy='xsel --clipboard --input'
+fi
+
+# コマンド補完設定(code-container)
+if which code >/dev/null && which docker >/dev/null; then
+    _code_container() { COMPREPLY=( $(compgen -W "$(docker ps -a --format '{{.Names}}')" -- ${COMP_WORDS[COMP_CWORD]}) ); }
+    complete -F _code_container code-container
 fi
