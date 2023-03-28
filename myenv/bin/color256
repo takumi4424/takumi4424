@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+####################################
+# Color pallet script              #
+# Version 1.0                      #
+# Copyright (C) 2018 Takumi Kodama #
+####################################
+
+for code in {0..15}; do
+	echo -ne "\033[38;5;${code}m $(printf %03d $code)"
+done
+
+echo
+
+for code in {16..255}; do
+	echo -ne "\033[38;5;${code}m $(printf %03d $code)"
+	if [ $((($code - 16) % 6)) -eq 5 ]; then
+		echo
+	fi
+done
