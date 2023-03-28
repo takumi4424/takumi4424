@@ -1,7 +1,0 @@
-# プログラム置き場
-export TAKUMI4424_BIN=~/.takumi4424/myenv/bin
-
-# パス通す(重複を防ぎつつ)
-if ! echo "$PATH" | grep -F "$TAKUMI4424_BIN" >/dev/null; then
-    export PATH="$TAKUMI4424_BIN:$PATH"
-fi

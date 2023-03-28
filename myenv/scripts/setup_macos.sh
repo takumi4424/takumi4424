@@ -4,34 +4,7 @@ set -eu
 here="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 source "$here/setup_common_pre.bash"
 
-################################################################################
-####################### デスクトップアプリケーション関連 #######################
-################################################################################
-# function is_app_installed() {
-#     local appdir=/Applications
-#     local app
-#     while read app; do
-#         if [[ $app =~ ^$appdir/$1 ]]; then return 0; fi
-#     done < <(find "$appdir" -type d -maxdepth 1)
-#     return 1
-# }
 
-# if is_app_installed "GoogleJapaneseInput"; then echo "nihogn installed!"; else echo "not installed"; fi
-
-# exit
-
-################################################################################
-################################### ホスト名 ###################################
-################################################################################
-# hostname=
-# sudo scutil --set LocalHostName "$hostname"
-# sudo scutil --set ComputerName  "$hostname"
-# # flush the DNS cache
-# dscacheutil -flushcache
-
-################################################################################
-start_installing 'Homebrew packages' ###########################################
-################################################################################
 # Homebrewでインストールするソフトウェアのリスト
 pkgs=(
     bash-completion
@@ -43,89 +16,35 @@ pkgs=(
 
 # Homebrew自体のインストール
 if ! which brew >/dev/null; then
-    start_installing_sub "installing homebrew itself..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    echo '----------------'
 fi
 
-# インストール済みソフトウェアの確認
-installed_pkgs=( $(brew list) )
-# 未インストールソフトの抽出
-uninstalled_pkgs=()
-for pkg in "${pkgs[@]}"; do
-    array_contains 'installed_pkgs' "$pkg" || uninstalled_pkgs+=("$pkg")
-done
+# いろいろインストール
+brew install \
+    fish \
+    git \
+    jq \
+    vim
 
-# 未インストールソフトのインストール
-if (( ${#uninstalled_pkgs[@]} > 0 )); then
-    start_installing_sub "installing brew packages..."
-    brew install "${uninstalled_pkgs[@]}"
-    echo '----------------'
+# ターミナルプロファイルの設定
+if ! [[ $(defaults read com.apple.terminal "Default Window Settings" 2>/dev/null) == "Iceberg@takumi4424" ]]; then
+    open "$resourcedir/Iceberg@takumi4424.terminal"
+    defaults write com.apple.terminal "Default Window Settings" "Iceberg@takumi4424"
 fi
 
-# インストールの実施状態表示
-for pkg in "${pkgs[@]}"; do
-    if array_contains 'installed_pkgs' "$pkg"; then
-        echo "not installed: $pkg: already installed"
-    else
-        echo "installed: $pkg"
-    fi
-done
-
-################################################################################
-start_installing 'Fonts' #######################################################
-################################################################################
-# 白源
-if ! [[ -d /Library/Fonts/HackGen ]]; then
-    url='https://github.com/yuru7/HackGen/releases'
-    pattern="<html><body>You are being <a href=\"$url/tag/(.+)\">redirected</a>\.</body></html>"
-    if [[ $(curl -s $url/latest) =~ ^$pattern$ ]]; then
-        # 最新のHackGenフォントをダウンロード
-        version="${BASH_REMATCH[1]}"
-        curl -Lo "$tempdir/HackGen.zip" "$url/download/$version/HackGen_$version.zip"
-        unzip "$tempdir/HackGen.zip" -d "$tempdir"
-        mv "$tempdir/HackGen_$version" /Library/Fonts/HackGen
-        echo '---'
-        echo 'successfully installed.'
-    else
-        abort 'Error: Failed to install HackGen font...'
-    fi
-else
-    echo 'already installed.'
+# Finderサイドバーの設定？など
+fname="com.apple.LSSharedFileList.FavoriteItems.sfl2"
+targetdir="$HOME/Library/Application Support/com.apple.sharedfilelist"
+if ! [[ -f $targetdir/$fname ]]; then
+    # ファイルが見つからない(なぜ？)
+    cp "$resourcedir/$fname" "$targetdir"
+elif [[ $(shasum -a 512 "$targetdir/$fname" | cut -f 1 -d ' ') != $(shasum -a 512 "$resourcedir/$fname" | cut -f 1 -d ' ') ]]; then
+    # ファイルの内容が違う
+    cp "$resourcedir/$fname" "$targetdir"
 fi
 
 ################################################################################
-start_installing 'LIMA' ########################################################
-################################################################################
-if ! grep 'Host lima-docker' ~/.ssh/config >/dev/null 2>&1; then
-    {
-        echo 'Host lima-docker'
-        echo '    NoHostAuthenticationForLocalhost yes'
-        echo '    HostName 127.0.0.1'
-        echo '    Port 60022'
-        echo '    IdentityFile ~/.lima/_config/user'
-    } >> ~/.ssh/config
-    echo 'edited: ~/.ssh/config: Host lima-docker appended'
-else
-    echo 'not edited: ~/.ssh/config: Host lima-docker already exists'
-fi
-
-################################################################################
-start_installing 'Git Configurations for MacOS' ################################
-################################################################################
-if ! [[ -d ~/.config/git ]]; then
-    mkdir -p ~/.config/git
-    echo 'created: ~/.config/git'
-fi
-if ! grep '.DS_Store' ~/.config/git/ignore >/dev/null 2>&1; then
-    echo '.DS_Store' >> ~/.config/git/ignore
-    echo 'edited: ~/.config/git/ignore: ".DS_Store" appended'
-else
-    echo 'edited: ~/.config/git/ignore: ".DS_Store" already exists'
-fi
-
-################################################################################
-start_installing 'System Preferences' ##########################################
+############################## その他システム設定 ##############################
 ################################################################################
 # Dock関連
 echo '- Dock'
@@ -172,46 +91,3 @@ echo '- Keyboard Shortcut'
 edit_hotkey 160 true  97    0  524288  # [Alt-A]     Launchpad
 edit_hotkey 60  true  32    49 1048576 # [Cmd-Space] 前の入力ソースを選択
 edit_hotkey 64  false 65535 49 1048576 #             Spotlightのショートカットが重複するので無効化(Command+Space)
-
-################################################################################
-start_installing 'Other Applications' ##########################################
-################################################################################
-# ターミナルプロファイルの設定
-if ! [[ $(defaults read com.apple.terminal "Default Window Settings" 2>/dev/null) == "Iceberg@takumi4424" ]]; then
-    open "$resourcedir/Iceberg@takumi4424.terminal"
-    defaults write com.apple.terminal "Default Window Settings" "Iceberg@takumi4424"
-    echo '- Terminal profile installed'
-else
-    echo '- Terminal profile already installed'
-fi
-# Finderサイドバーの設定？など
-fname="com.apple.LSSharedFileList.FavoriteItems.sfl2"
-targetdir="$HOME/Library/Application Support/com.apple.sharedfilelist"
-if ! [[ -f $targetdir/$fname ]]; then
-    # ファイルが見つからない(なぜ？)
-    cp "$resourcedir/$fname" "$targetdir"
-    echo '- Finder sidebar settings installed'
-elif [[ $(shasum -a 512 "$targetdir/$fname" | cut -f 1 -d ' ') != $(shasum -a 512 "$resourcedir/$fname" | cut -f 1 -d ' ') ]]; then
-    # ファイルの内容が違う
-    cp "$resourcedir/$fname" "$targetdir"
-    echo '- Finder sidebar settings installed'
-else
-    echo '- Finder sidebar settings already installed'
-fi
-
-################################################################################
-################################### Fish関連 ###################################
-################################################################################
-# pattern="UserShell: $(which fish)"
-# if ! [[ $(dscl . -read /Users/$USER UserShell) =~ ^$pattern$ ]]; then
-#     # デフォルトシェルがfishじゃない場合はセットアップ
-#     if ! cat /etc/shells | grep -E "^$(which fish)$" >/dev/null; then
-#         echo "$(which fish)" | sudo tee -a /etc/shells >/dev/null
-#     fi
-#     chsh -s "$(which fish)"
-# fi
-
-
-
-# 終わりに
-source "$here/setup_common_post.bash"
