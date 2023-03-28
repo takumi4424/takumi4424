@@ -1,14 +1,11 @@
 # プログラム置き場
-set -x TAKUMI4424_BIN ~/.takumi4424/myenv/bin
-# パス通す(重複を防ぎつつ)
-if ! echo "$PATH" | grep -F "$TAKUMI4424_BIN" >/dev/null
-    set -x PATH "$TAKUMI4424_BIN" $PATH
-end
+fish_add_path "$HOME/.takumi4424/myenv/bin"
 
 if test (uname -s) = 'Darwin'
     # MacOS用設定
-    # alias lima_start_docker='limactl start ~/.takumi4424/myenv/lima/docker.yaml'
-    # set -x DOCKER_HOST 'ssh://lima-docker'
+else if grep -qi microsoft /proc/version 2>/dev/null
+    # WSLの場合
+    alias pbcopy='clip.exe'
 else if grep 'NAME="Ubuntu"' /etc/os-release >/dev/null
     # Ubuntu用設定
     alias open='xdg-open'

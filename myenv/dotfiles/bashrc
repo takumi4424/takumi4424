@@ -1,6 +1,9 @@
 if [[ $(uname -s) = 'Darwin' ]]; then
     # MacOS用設定
     . /usr/local/etc/bash_completion
+elif grep -qi microsoft /proc/version 2>/dev/null; then
+    # WSLの場合
+    alias pbcopy='clip.exe'
 elif grep 'NAME="Ubuntu"' /etc/os-release >/dev/null; then
     # Ubuntu用設定
     alias open='xdg-open'
