@@ -3,23 +3,36 @@ set -eu
 
 # このスクリプトがあるディレクトリ
 here="$(cd -- "$(dirname -- "${BASH_SOURCE:-$0}")"; pwd)"
-# プログラム置き場
-bindir="$(cd -- "$here/bin"; pwd)"
-# いろんな設定用リソース置き場
-resourcedir="$(cd -- "$here/resources"; pwd)"
-dotfiles="$(cd -- "$here/dotfiles"; pwd)"
+# セットアップスクリプト置き場
+scripts="$(cd -- "$here/scripts"; pwd)"
 
-# 指定された引数をすべてエラー出力し、スクリプトを終了します。
-# usage: abort [ERROR_MESSAGE]...
-function abort() {
-    local arg
-    if (( $# > 0 )); then for arg in "$@"; do printf '%s\n' "$arg" >&2; done; fi
-    exit 1
-}
+# Ubuntuかどうかチェック
+is_ubuntu=false
+grep 'NAME="Ubuntu"' /etc/os-release &>/dev/null && is_ubuntu=true
 
-if   [[ $(uname -s) = 'Darwin' ]];                    then echo "is_macos=true"
-elif grep -qi microsoft /proc/version 2>/dev/null;    then echo "is_wsl=true"
-elif grep 'NAME="Ubuntu"' /etc/os-release >/dev/null; then echo "is_ubuntu=true"
+# 各プラットフォーム向け設定
+if [[ $(uname -s) = 'Darwin' ]]; then
+    # macOS
+    # not tested!!!!!!!
+    "$scripts/setup_macos.sh"
+    "$scripts/setup_shell.sh"
+elif $is_ubuntu && grep -i microsoft /proc/version &>/dev/null; then
+    # WSL Ubuntu
+    "$scripts/setup_ubuntu_wsl.sh"
+    "$scripts/setup_shell.sh"
+elif $is_ubuntu; then
+    # Ubuntu
+    "$scripts/setup_ubuntu.sh"
+    "$scripts/setup_shell.sh"
 else
-    abort 'Error: Unknown platform.'
+    echo 'Error: Unknown platform.' >&2
+    exit 1
 fi
+
+echo "################################
+Setup succeeded!
+Recommend:
+  - VSCode
+  - Google IME
+  - Google Chrome
+  - HachGen Font"
