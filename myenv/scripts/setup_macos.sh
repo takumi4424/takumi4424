@@ -4,16 +4,6 @@ set -eu
 here="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 source "$here/setup_common_pre.bash"
 
-
-# Homebrewでインストールするソフトウェアのリスト
-pkgs=(
-    bash-completion
-    fish
-    dialog
-    jq
-    lima
-)
-
 # Homebrew自体のインストール
 if ! which brew >/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -72,8 +62,8 @@ defaults write com.apple.systemuiserver menuExtras -array-add "/System/Library/C
 echo '- Screen Capture'
 defaults write com.apple.screencapture “disable-shadow”-bool yes            # スクリーンキャプチャ時にウィンドウに影をつけない
 defaults write com.apple.screencapture name Screenshot                        # 名前は"Screenshot*.png"
-defaults write com.apple.screencapture location ~/Pictures/Screenshots/       # スクリーンキャプチャ保存先設定
-[[ -d ~/Pictures/Screenshots ]] || mkdir ~/Pictures/Screenshots               # 保存先ディレクトリがなければ作成
+defaults write com.apple.screencapture location "$HOME/Pictures/Screenshots/" # スクリーンキャプチャ保存先設定
+[[ -d $HOME/Pictures/Screenshots ]] || mkdir "$HOME/Pictures/Screenshots"     # 保存先ディレクトリがなければ作成
 # キーボード関連
 echo '- Keyboard'
 defaults write -g KeyRepeat -int 2                                            # キーリピート速度(早め)

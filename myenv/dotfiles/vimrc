@@ -24,10 +24,10 @@ let $VIM_TMP=expand('$VIM/tmp')
 " プラグイン置き場
 let $VIM_BUNDLES=expand('$VIM/bundles')
 " dein.vimのパス
-let $VIM_DEIN=expand('$VIM/bundles/repos/github.com/Shougo/dein.vim')
+let $VIM_DEIN=expand('$VIM_BUNDLES/repos/github.com/Shougo/dein.vim')
 " ない場合はディレクトリ作成
 if !isdirectory(expand('$VIM'))     | call mkdir(expand('$VIM'))     | endif
-if !isdirectory(expand('$VIM/tmp')) | call mkdir(expand('$VIM/tmp')) | endif
+if !isdirectory(expand('$VIM_TMP')) | call mkdir(expand('$VIM_TMP')) | endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""" Other Options """""""""""""""""""""""""""""""""
@@ -35,11 +35,11 @@ if !isdirectory(expand('$VIM/tmp')) | call mkdir(expand('$VIM/tmp')) | endif
 " 自動生成ファイル関連
 set viminfo+=n$VIM/viminfo      " 履歴情報ファイルの保存先
 set swapfile                    " スワップファイル(*.swp)を生成
-set directory=$VIM/tmp,.        " 保存先は最悪カレントディレクトリ(.)
+set directory=$VIM_TMP,.        " 保存先は最悪カレントディレクトリ(.)
 set backup                      " バックアップファイル(*~)を生成
-set backupdir=$VIM/tmp,.        " 保存先は最悪カレントディレクトリ(.)
+set backupdir=$VIM_TMP,.        " 保存先は最悪カレントディレクトリ(.)
 set undofile                    " アンドゥファイル(*.un~)を生成
-set undodir=$VIM/tmp,.          " 保存先は最悪カレントディレクトリ(.)
+set undodir=$VIM_TMP,.          " 保存先は最悪カレントディレクトリ(.)
 " 表示
 syntax enable                   " 構文ハイライト有効化
 set number                      " 行番号表示
@@ -113,8 +113,17 @@ inoremap <C-e> <ESC>$a
 """""""""""""""""""""""" Plugin Management by dein.vim """""""""""""""""""""""""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if !isdirectory($VIM_DEIN)
-    " まだ無い場合はdein.vimをインストール
-    exec 'silent !curl -fsSL https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh | /bin/bash -s -- '.$VIM_BUNDLES.' >/dev/null'
+    " dein.vimがインストールされていない場合はメッセージ表示してほぼ素のvimで
+    echohl WarningMsg |
+        \ echo "--------------------------------" |
+        \ echo "Error: " . $VIM_DEIN . ": Not found." |
+        \ echo "Your vim environment is not dark powered." |
+        \ echo "Install dein.vim to '" . $VIM_BUNDLES . "'." |
+        \ echo "(e.g. 'sh install.sh " . $VIM_BUNDLES . "')" |
+        \ echo "See: https://github.com/Shougo/dein.vim" |
+        \ echo "--------------------------------" |
+        \ echohl None
+    finish
 endif
 set runtimepath+=$VIM_DEIN
 " プラグインの管理
