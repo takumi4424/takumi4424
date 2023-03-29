@@ -9,6 +9,7 @@ dotfiles="$(cd -- "$here/../dotfiles"; pwd)"
 vim_bundles="$HOME/.local/share/vim/bundles"
 
 # 設定ファイルをシンボリックリンクとして配置
+[[ -d $HOME/.config/fish/conf.d ]] || mkdir -p "$HOME/.config/fish/conf.d"
 ln -sf "$dotfiles/takumi4424.fish" "$HOME/.config/fish/conf.d/takumi4424.fish"
 ln -sf "$dotfiles/vimrc"           "$HOME/.vimrc"
 
