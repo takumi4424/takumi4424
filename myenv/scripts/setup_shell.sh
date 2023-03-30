@@ -38,6 +38,7 @@ fisher_url='https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions
 fish -c "curl -sL '$fisher_url' | source && fisher install jorgebucaran/fisher"
 # fisherを使ってプラグインのインストール
 fish -c "fisher install oh-my-fish/theme-bobthefish"
+fish -c "fisher install edc/bass"
 
 # 指定されたfish補完スクリプトをインストールします
 function install_fish_completion() {
