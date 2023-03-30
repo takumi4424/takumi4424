@@ -8,6 +8,7 @@ else if grep -qi microsoft /proc/version 2>/dev/null
     alias pbcopy='clip.exe'
 else if grep 'NAME="Ubuntu"' /etc/os-release >/dev/null
     # Ubuntu用設定
+    alias sudo='sudo -E'
     alias open='xdg-open'
     alias pbcopy='xsel --clipboard --input'
 end

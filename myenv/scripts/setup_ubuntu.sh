@@ -7,9 +7,9 @@ here="$(cd -- "$(dirname -- "${BASH_SOURCE:-$0}")"; pwd)"
 resourcedir="$(cd -- "$here/../resources"; pwd)"
 
 # いろいろインストール
-sudo apt-add-repository ppa:fish-shell/release-3 # fish shellのためのリポジトリ追加
-sudo apt update
-sudo apt install -y \
+sudo -E apt-add-repository ppa:fish-shell/release-3 # fish shellのためのリポジトリ追加
+sudo -E apt update
+sudo -E apt install -y \
     fish \
     git \
     jq \
