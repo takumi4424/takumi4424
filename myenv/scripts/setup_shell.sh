@@ -4,6 +4,7 @@ set -eu
 # このスクリプトがあるディレクトリ
 here="$(cd -- "$(dirname -- "${BASH_SOURCE:-$0}")"; pwd)"
 # いろんな設定用リソース置き場
+bindir="$(cd -- "$here/../bin"; pwd)"
 dotfiles="$(cd -- "$here/../dotfiles"; pwd)"
 # vimプラグインインストール先
 vim_bundles="$HOME/.local/share/vim/bundles"
@@ -52,8 +53,26 @@ install_fish_completion https://raw.githubusercontent.com/docker/compose/master/
 git config --global user.email    '57510056+takumi4424@users.noreply.github.com'
 git config --global user.name     'Takumi Kodama'
 git config --global core.autocrlf 'false'
-# macOS用の無視するファイル追加
-[[ -d $HOME/.config/git ]] || mkdir -p "$HOME/.config/git"
-if ! grep '.DS_Store' "$HOME/.config/git/ignore" >/dev/null 2>&1; then
-    echo '.DS_Store' >> "$HOME/.config/git/ignore"
+# 各プラットフォーム向け設定
+is_ubuntu=false
+grep 'NAME="Ubuntu"' /etc/os-release &>/dev/null && is_ubuntu=true
+if [[ $(uname -s) = 'Darwin' ]]; then
+    # macOS
+    # .DS_Storeを無視するように設定する
+    if ! [[ -d $HOME/.config/git ]]; then
+        mkdir -p "$HOME/.config/git"
+    fi
+    if ! grep '.DS_Store' "$HOME/.config/git/ignore" >/dev/null 2>&1; then
+        echo '.DS_Store' >> "$HOME/.config/git/ignore"
+    fi
+elif $is_ubuntu && grep -i microsoft /proc/version &>/dev/null; then
+    # WSL Ubuntu
+    # GCMをGitBash同梱のプログラムを使用してやるが、WSLから.exeの実行が遅すぎるのですこし改造
+    git config --global credential.helper "$bindir/gcm-helper-for-wsl.sh"
+elif $is_ubuntu; then
+    # Ubuntu
+    :
+else
+    echo 'Error: Unknown platform.' >&2
+    exit 1
 fi

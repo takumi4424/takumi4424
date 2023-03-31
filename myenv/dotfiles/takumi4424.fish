@@ -5,7 +5,8 @@ if test (uname -s) = 'Darwin'
     # MacOS用設定
 else if grep -qi microsoft /proc/version 2>/dev/null
     # WSLの場合
-    alias pbcopy='clip.exe'
+    # .exeの実行が大変遅い（10秒くらい）なので、小細工
+    alias pbcopy='bash -c "cd /mnt/c/; clip.exe"'
 else if grep 'NAME="Ubuntu"' /etc/os-release >/dev/null
     # Ubuntu用設定
     alias sudo='sudo -E'
