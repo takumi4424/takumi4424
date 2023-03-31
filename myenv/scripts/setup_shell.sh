@@ -71,7 +71,19 @@ elif $is_ubuntu && grep -i microsoft /proc/version &>/dev/null; then
     git config --global credential.helper "wsl-trick"
 elif $is_ubuntu; then
     # Ubuntu
-    :
+    echo '################################'
+    echo 'To setup Git Credential Manager, run:'
+    echo '  # download latest gcm-linux_*.deb'
+    echo '  # from: https://github.com/git-ecosystem/git-credential-manager/releases'
+    echo '  $ dpkg -i /path/to/gcm-linux_*.deb'
+    echo '  $ git-credential-manager configure'
+    echo '  $ git config --global --replace-all credential.helper $(which git-credential-manager)'
+    echo '  $ git config --global credential.credentialStore secretservice'
+    echo 'See:'
+    echo '  - https://docs.github.com/ja/get-started/getting-started-with-git/caching-your-github-credentials-in-git?platform=linux#git-credential-manager'
+    echo '  - https://github.com/git-ecosystem/git-credential-manager/blob/release/docs/install.md#install-from-source-helper-script'
+    echo '  - https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/credstores.md#freedesktoporg-secret-service-api'
+    echo '################################'
 else
     echo 'Error: Unknown platform.' >&2
     exit 1
