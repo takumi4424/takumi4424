@@ -4,7 +4,6 @@ set -eu
 # このスクリプトがあるディレクトリ
 here="$(cd -- "$(dirname -- "${BASH_SOURCE:-$0}")"; pwd)"
 # いろんな設定用リソース置き場
-bindir="$(cd -- "$here/../bin"; pwd)"
 dotfiles="$(cd -- "$here/../dotfiles"; pwd)"
 # vimプラグインインストール先
 vim_bundles="$HOME/.local/share/vim/bundles"
@@ -67,8 +66,9 @@ if [[ $(uname -s) = 'Darwin' ]]; then
     fi
 elif $is_ubuntu && grep -i microsoft /proc/version &>/dev/null; then
     # WSL Ubuntu
-    # GCMをGitBash同梱のプログラムを使用してやるが、WSLから.exeの実行が遅すぎるのですこし改造
-    git config --global credential.helper "$bindir/gcm-helper-for-wsl.sh"
+    # GCMをGitBash同梱のプログラムを使用してやるが、WSLから.exeの実行が遅すぎるのですこし小細工
+    # ../bin/git-credential-wsl-trickを使うように設定
+    git config --global credential.helper "wsl-trick"
 elif $is_ubuntu; then
     # Ubuntu
     :
